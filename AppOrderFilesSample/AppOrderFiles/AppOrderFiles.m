@@ -40,16 +40,16 @@ void __sanitizer_cov_trace_pc_guard_init(uint32_t *start,
 // But for large functions it will emit a simple call:
 //    __sanitizer_cov_trace_pc_guard(guard);
 void __sanitizer_cov_trace_pc_guard(uint32_t *guard) {
-    if (collectFinished || !*guard) {
+    if (collectFinished || *guard == UINT32_MAX) {
         return;
     }
-    // If you set *guard to 0 this code will not be called again for this edge.
+    // If you set *guard to UINT32_MAX this code will not be called again for this edge.
     // Now you can get the PC and do whatever you want:
     //   store it somewhere or symbolize it and print right away.
     // The values of `*guard` are as you set them in
     // __sanitizer_cov_trace_pc_guard_init and so you can make them consecutive
     // and use them to dereference an array or a bit vector.
-    *guard = 0;
+    *guard = UINT32_MAX;
     void *PC = __builtin_return_address(0);
     PCNode *node = malloc(sizeof(PCNode));
     *node = (PCNode){PC, NULL};
